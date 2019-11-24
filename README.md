@@ -31,18 +31,18 @@ In model building part, we applied four different predictive machine learning mo
 We mainly dealt with 3 useful columns in this phase: `product description`, `search term`, `product title`. For `product description`, we removed HTML tags, punctuation, stop words, non-alphabetic terms, tokens with length < 2 and stemmelized it. For `search term`, since it is typed from people, it may contain typos and different word classes, so we normalized it and corrected spelling errors. For `product title`, we only normalized it.
 #### Feature Engineering 
 We created 12 new features in this part, and each of them is closely related to the similarity between `product description`, `search term` and `product title`. The new features are:  
-length_search: length for `search term`  
-length_title: length for `product title`  
-length_description: length for  `product description`  
-number_of_common_1: the number of common words between token of `search term` and that of `product title`  
-number_of_common_2: the number of common words between token of `search term` and that of `product description`  
-number_of_shared_words: the number of shared words between token of `search term`, `product title` and `product description`  
-ratio_1: number of common words between `search term` and `product title` / length of `search term`  
-ratio_2: number of common words between `search term` and `product description` / length of `search term`  
-simple_ratio: simple fuzzywuzzy similarity between `search term` and `product title`  
-sort_ratio: sorted fuzzywuzzy similarity between `search term` and `product title` without considering the order   
-cosine_score: cosine similarity between `search term` and `product title`, which measures the  cosine of the angle between these two term vectors  
-jaccard_score: jaccard similarity between `search term` and `product title`, which is the size of the intersection divided by the size of the union of these two terms  
+* length_search: length for `search term`  
+* length_title: length for `product title`  
+* length_description: length for  `product description`  
+* number_of_common_1: the number of common words between token of `search term` and that of `product title`  
+* number_of_common_2: the number of common words between token of `search term` and that of `product description`  
+* number_of_shared_words: the number of shared words between token of `search term`, `product title` and `product description`  
+* ratio_1: number of common words between `search term` and `product title` / length of `search term`  
+* ratio_2: number of common words between `search term` and `product description` / length of `search term`  
+* simple_ratio: simple fuzzywuzzy similarity between `search term` and `product title`  
+* sort_ratio: sorted fuzzywuzzy similarity between `search term` and `product title` without considering the order   
+* cosine_score: cosine similarity between `search term` and `product title`, which measures the  cosine of the angle between these two term vectors  
+* jaccard_score: jaccard similarity between `search term` and `product title`, which is the size of the intersection divided by the size of the union of these two terms  
  
 #### Exploratory Data Analysis
 Since our goal is to predict `relevance`, we need to identify the correlation between predictor variables and the target. Therefore, we first  plotted the `histogram` for all new features to see their distributions. It is not hard to find that some couple of columns have similar distribution, such as `cosine_score`, `jaccard_score` and `length_description`, also like `number_of_shared_words`, `simple_ratio` and `sort_ratio`.  
@@ -52,13 +52,13 @@ After going through basic evaluation, it may lead to a conclusion that it is not
 
 #### Model Building
 We randomly selected 70% of our data as training data and the remaining as test data. Then we built  four models to use 12 numerical variables to predict for `relevance`.  
-Lasso:   
+* Lasso:   
 Lasso helps to make an automatic feature selection and we built it as a benchmark. We first tried a range of alpha value and made a trajectory plot of lasso coefficients, showing that `ratio_1` is the last column in the model. Then we used LassoCV to choose the optimal alpha value, which is 1.32*10^-6. Then this value was put into our lasso model and fit the training data. Finally  we got RMSE of test data is 0.487.  
-Random Forest:   
+* Random Forest:   
 For this model, we used GridSearchCV to find the best parameters. We set `max_depth` as [5,6,7] and `n_estimators` as [200,400,600] and got the optimal parameters that `max_depth` is 7 and `n_estimators` is 400. It turns out that random forest with best parameters performs better than lasso with test RMSE to be 0.481.  
-Xgboost:    
+* Xgboost:    
 For this model, we also used GridSearchCV to find the best parameters. We set `max_depth` as [2,4,6,8] and `n_estimators` as [20,50,100,200] and got the optimal parameters that `max_depth` is 4 and `n_estimators` is 100. It turns out that the result of Xgboost is slightly better than random forest  with test RMSE to be 0.480.  
-Chain model with pipeline:   
+* Chain model with pipeline:   
 We picked two best models - Random Forest and Xgboost, from the previous three models and built a pipeline to to fit the training data. However, the test RMSE is 0.483, which is higher than both of separating models.   
  
 ### Results & Analysis
